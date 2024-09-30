@@ -13,7 +13,7 @@ services:
       - ../../specs/http-openapi.yaml:/etc/zilla/http-openapi.yaml
       - ../../specs/kafka-asyncapi.yaml:/etc/zilla/kafka-asyncapi.yaml
       - ../../zilla.yaml:/etc/zilla/zilla.yaml
-    command: start -v -e -Pzilla.engine.verbose.composites=true
+    command: start -v -e
 
 networks:
   default:
