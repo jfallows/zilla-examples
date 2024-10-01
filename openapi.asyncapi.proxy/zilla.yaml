@@ -1,5 +1,5 @@
 ---
-name: zilla-openapi-proxy
+name: zilla-openapi-asyncapi-proxy
 catalogs:
   host_filesystem:
     type: filesystem
