@@ -6,14 +6,15 @@ services:
     restart: unless-stopped
     ports:
       - 7114:7114
-      - 4444:4444
+      #- 4444:4444
     environment:
       ZILLA_INCUBATOR_ENABLED: "true"
+      #JAVA_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:4444
     volumes:
-      - ../../specs/http-openapi.yaml:/etc/zilla/http-openapi.yaml
-      - ../../specs/kafka-asyncapi.yaml:/etc/zilla/kafka-asyncapi.yaml
+      - ../../specs/light-openapi.yaml:/etc/zilla/light-openapi.yaml
+      - ../../specs/light-asyncapi.yaml:/etc/zilla/light-asyncapi.yaml
       - ../../zilla.yaml:/etc/zilla/zilla.yaml
-    command: start -v -e
+    command: start -v -e -Pzilla.engine.verbose.composites=true
 
 networks:
   default:

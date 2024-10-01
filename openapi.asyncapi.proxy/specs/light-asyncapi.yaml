@@ -1,0 +1,189 @@
+asyncapi: 3.0.0
+
+info:
+  title: budgets API
+  version: '1.0'
+  description: >-
+    API specification from client perspective
+
+defaultContentType: application/json
+
+servers:
+  kafkaServer:
+    host: host.docker.internal:9092
+    protocol: kafka
+    description: ""
+
+channels:
+  requestTopic:
+    description: A Client-Specific topic where requests can be sent
+    address: requests
+    messages:
+      budgetRequest:
+        $ref: '#/components/messages/budgetRequest'
+      reservationsRequest:
+        $ref: '#/components/messages/reservationsRequest'
+  responseTopic:
+    description: A Client-Specific topic to read responses for the requests
+    address: responses
+    messages:
+      Response:
+        $ref: '#/components/messages/Response'
+
+operations:
+  doCreateBudget:
+    action: send
+    channel:
+      $ref: '#/channels/requestTopic'
+    messages:
+      - $ref: '#/channels/requestTopic/messages/budgetRequest'
+    reply:
+      channel:
+        $ref: '#/channels/responseTopic'
+  doReserveBudget:
+    action: send
+    channel:
+      $ref: '#/channels/requestTopic'
+    messages:
+      - $ref: '#/channels/requestTopic/messages/reservationsRequest'
+    reply:
+      channel:
+        $ref: '#/channels/responseTopic'
+  # TODO: should include response topic models implicitly, therefore should not require this operation to be defined
+  onBudgetResponse:
+    action: receive
+    channel:
+        $ref: '#/channels/responseTopic'
+ 
+components:
+  messages:
+    budgetRequest:
+      title: budgetRequest
+      description: ""
+      traits:
+        - $ref: '#/components/messageTraits/KafkaKey'
+        - $ref: '#/components/messageTraits/CommonHeaders'
+      headers:
+        properties:
+          requestType:
+            const: budget
+      payload:
+        $ref: '#/components/schemas/budgetSpecificPayload'
+      examples:
+        - name: "createBudget"
+          headers:
+            msgId: Msg001
+            requestType: budget
+          payload:
+            amount: 100
+
+    reservationsRequest:
+      title: reservationsRequest
+      description: ""
+      traits:
+        - $ref: '#/components/messageTraits/KafkaKey'
+        - $ref: '#/components/messageTraits/CommonHeaders'
+      headers:
+        type: object
+        properties:
+          requestType:
+            const: reservations
+      payload:
+        $ref: '#/components/schemas/reservationsSpecificPayload'
+
+    Response:
+      title: Response
+      traits:
+        - $ref: '#/components/messageTraits/KafkaKey'
+        - $ref: '#/components/messageTraits/CommonHeaders'
+      headers:
+        type: object
+        properties:
+          requestType:
+            type: string
+            enum:
+              - budget
+              - reservations
+            description: >-
+              The request-type from the request
+      payload:
+        $ref: '#/components/schemas/ResponsePayload'
+      examples:
+        - name: "budgetCreate"
+          headers:
+            msgId: Msg001
+            requestType: budget
+          payload:
+            accept: "yes"
+            total: 100
+
+  schemas:
+    budgetSpecificPayload:
+      title: budgetSpecifics
+      type: object
+      properties:
+        amount:
+          type: number
+          description: ""
+
+    reservationsSpecificPayload:
+      title: reservationsSpecificPayload
+      type: object
+      properties:
+        reservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/reservationBody'
+          description: ""
+      required:
+        - reservations
+
+    reservationBody:
+      title: reservationBody
+      type: object
+      properties:
+        amount:
+          type: number
+          description: ""
+      required:
+        - amount
+
+    ResponsePayload:
+      title: ResponsePayload
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - Undefined
+            - ParseError
+            - MissingBudgetId
+            - MissingMsgId
+          description: |
+            Will be set in case of any errors
+        accept:
+          type: string
+          enum:
+            - "yes"
+            - "no"
+          description: ""
+        total:
+          type: number
+          description: ""
+
+  messageTraits:
+    KafkaKey:
+      bindings:
+        kafka:
+          key:
+            type: string
+            description: "key is the budgetId which will affect the target partitions"
+
+    CommonHeaders:
+      headers:
+        properties:
+          msgId:
+            type: string
+            description: >-
+              This ID needs to be defined by the client. It will be used to map requests to responses.
+              For an unambiguously mapping the id has to be unique per client.

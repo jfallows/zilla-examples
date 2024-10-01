@@ -1,0 +1,155 @@
+openapi: 3.0.3
+info:
+  title: budgets API
+  version: '0.8.10'
+  description: ""
+servers:
+  - url: http://localhost:7114/v1
+    description: Optional server description, e.g. Local server for development
+
+paths:
+  /budget:
+    put:
+      description: ""
+      operationId: doCreateBudget
+      requestBody:
+        description: to be done
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BudgetRequestPayload"
+            examples:
+              "budget create":
+                value:
+                  budgetId: "budgetId1"
+                  msgId: "Msg001"
+                  amount: 100
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponsePayload'
+              examples:
+                "budget anlegen":
+                  value:
+                    msgId: "Msg001"
+                    budgetId: "budgetId1"
+                    accept: "yes"
+                    total: 100
+
+  /reservation:
+    put:
+      description: ""
+      operationId: doReserveBudget
+      requestBody:
+        description: to be done
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/reservationsPayload"
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponsePayload'
+
+# ------------------------------------------------------------------------------
+# Components
+# ------------------------------------------------------------------------------
+components:
+  schemas:
+    BudgetRequestPayload:
+      type: object
+      additionalProperties: false
+      required: 
+      - budgetId
+      - msgId
+      - amount
+      properties:
+        budgetId:
+          description: "budget reference, maps to a Kafka key"
+          type: string
+          example: budget1
+          maxLength: 64
+          pattern: '^[\w\-\.]+'
+        msgId:
+          description: "Unique ID for a request defined by client which will be used for the response."
+          type: string
+          example: Msg001
+          maxLength: 64
+          pattern: '^[\w\-\.]+'
+        amount:
+          type: number
+          description: ""
+          example: 100
+
+    reservationsPayload:
+      type: object
+      required: 
+      - budgetId
+      - msgId
+      - reservations
+      properties:
+        budgetId:
+          description: "reference id"
+          type: string
+          example: budgetId1
+          maxLength: 64
+          pattern: '^[\w\-\.]+'
+        msgId:
+          description: >-
+            Unique ID for a request defined by client which will be used for the response.
+          type: string
+          example: Msg002
+          maxLength: 64
+          pattern: '^[\w\-\.]+'
+        reservations:
+          type: array
+          description: ""
+          items:
+            $ref: '#/components/schemas/reservationBody'
+            
+    reservationBody:
+      type: object
+      required:
+        - amount
+      properties:
+        amount:
+          type: number
+          description: ""
+          example: 550
+            
+    #-----------------------------------------------------------------------------------
+    # RESPONSE
+    # ----------------------------------------------------------------------------------
+    ResponsePayload:
+      type: object
+      additionalProperties: false
+      properties:
+        error:
+          type: string
+          enum:
+            - Undefined
+            - ParseError
+            - MissingBudgetId
+            - MissingMsgId
+          description: |
+            Will be set in case of any errors
+          example:
+        accept:
+          type: string
+          enum:
+            - "yes"
+            - "no"
+          description: ""
+        total:
+          type: number
+          description: ""
+          example: 200
+    

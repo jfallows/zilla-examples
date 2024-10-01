@@ -6,9 +6,9 @@ catalogs:
     options:
       subjects:
         http:
-          path: http-openapi.yaml
+          path: light-openapi.yaml
         kafka:
-          path: kafka-asyncapi.yaml
+          path: light-asyncapi.yaml
 bindings:
   north_openapi_server:
     type: openapi
