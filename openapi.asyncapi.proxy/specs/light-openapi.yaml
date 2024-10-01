@@ -77,13 +77,13 @@ components:
           type: string
           example: budget1
           maxLength: 64
-          pattern: '^[\w\-\.]+'
+          pattern: '^[\w\-\.]+$'
         msgId:
           description: "Unique ID for a request defined by client which will be used for the response."
           type: string
           example: Msg001
           maxLength: 64
-          pattern: '^[\w\-\.]+'
+          pattern: '^[\w\-\.]+$'
         amount:
           type: number
           description: ""
@@ -101,14 +101,14 @@ components:
           type: string
           example: budgetId1
           maxLength: 64
-          pattern: '^[\w\-\.]+'
+          pattern: '^[\w\-\.]+$'
         msgId:
           description: >-
             Unique ID for a request defined by client which will be used for the response.
           type: string
           example: Msg002
           maxLength: 64
-          pattern: '^[\w\-\.]+'
+          pattern: '^[\w\-\.]+$'
         reservations:
           type: array
           description: ""
