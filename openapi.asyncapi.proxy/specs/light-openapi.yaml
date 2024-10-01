@@ -67,7 +67,7 @@ components:
     BudgetRequestPayload:
       type: object
       additionalProperties: false
-      required: 
+      required:
       - budgetId
       - msgId
       - amount
@@ -91,7 +91,7 @@ components:
 
     reservationsPayload:
       type: object
-      required: 
+      required:
       - budgetId
       - msgId
       - reservations
@@ -114,7 +114,7 @@ components:
           description: ""
           items:
             $ref: '#/components/schemas/reservationBody'
-            
+
     reservationBody:
       type: object
       required:
@@ -124,7 +124,7 @@ components:
           type: number
           description: ""
           example: 550
-            
+
     #-----------------------------------------------------------------------------------
     # RESPONSE
     # ----------------------------------------------------------------------------------
@@ -152,4 +152,3 @@ components:
           type: number
           description: ""
           example: 200
-    
