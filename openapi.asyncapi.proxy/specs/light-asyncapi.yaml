@@ -10,7 +10,7 @@ defaultContentType: application/json
 
 servers:
   kafkaServer:
-    host: host.docker.internal:9092
+    host: kafka:9092
     protocol: kafka
     description: ""
 

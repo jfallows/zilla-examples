@@ -13,17 +13,14 @@ brew install kcat
 
 ### Setup
 
-The `setup.sh` script will:
-
+- Start local Kafka broker
+- Create requied Kafka topics
+- Start local Kafka UI
 - Configure Zilla instance
 
 ```bash
-./compose/setup.sh
+docker compose up 
 ```
-
-### Start Kafka Broker
-
-Run the `setup.sh` script in `kafka.broker` [compose](../kafka.broker/docker/compose) folder.
 
 ### Test
 

@@ -50,6 +50,11 @@ bindings:
           catalog:
             host_filesystem:
               subject: kafka
+      kafka:
+        sasl:
+          mechanism: scram-sha-256
+          username: alice
+          password: ${{env.SASL_PASSWORD}}
 telemetry:
   exporters:
     stdout_logs_exporter:
