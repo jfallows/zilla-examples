@@ -1,7 +1,6 @@
 services:
   zilla:
     image: ghcr.io/aklivity/zilla:latest
-    container_name: zilla
     depends_on:
       - kafka
     pull_policy: always
@@ -28,7 +27,6 @@ services:
 
   kafka:
     image: bitnami/kafka:3.5
-    container_name: kafka
     restart: unless-stopped
     ports:
       - 29092:29092
@@ -45,13 +43,12 @@ services:
       KAFKA_CFG_ADVERTISED_LISTENERS: "CLUSTER://kafka:9094,CLIENT://kafka:9092,EXTERNAL://localhost:29092"
       KAFKA_CFG_LOG_DIRS: "/tmp/logs"
       # KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_CFG_SASL_ENABLED_MECHANISMS: "SCRAM-SHA-256"
+      KAFKA_CFG_SASL_ENABLED_MECHANISMS: "SCRAM-SHA-512"
       KAFKA_CLIENT_USERS: alice
       KAFKA_CLIENT_PASSWORDS: secret
 
   kafka-init:
     image: bitnami/kafka:3.5
-    container_name: kafka-init
     depends_on:
       - kafka
     environment:
@@ -65,7 +62,6 @@ services:
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
-    container_name: kafka-ui
     ports:
       - 8182:8080
     environment:

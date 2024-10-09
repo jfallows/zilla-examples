@@ -52,7 +52,7 @@ bindings:
               subject: kafka
       kafka:
         sasl:
-          mechanism: scram-sha-256
+          mechanism: scram-sha-512
           username: alice
           password: ${{env.SASL_PASSWORD}}
 telemetry:

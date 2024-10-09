@@ -84,10 +84,3 @@ echo '{"budgetId": "budgetId1", "msgId": "Msg001", accept: "yes", total: 100}' |
          -H "zilla:correlation-id=1-46108a33f0174340c245b71274f2d9bb"
 ```
 
-### Teardown
-
-The `teardown.sh` script will remove any resources created.
-
-```bash
-./compose/teardown.sh
-```
