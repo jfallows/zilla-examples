@@ -54,6 +54,7 @@ services:
       - kafka
     environment:
       KAFKA_BOOTSTRAP_SERVER: ${KAFKA_BOOTSTRAP_SERVER:-kafka:9092}
+      KAFKA_HEAP_OPTS: ${KAFKA_HEAP_OPTS:--Xmx64M}
     configs:
       - source: client.properties
         target: /tmp/client.properties
