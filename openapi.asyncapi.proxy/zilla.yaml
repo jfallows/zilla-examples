@@ -53,7 +53,7 @@ bindings:
       kafka:
         sasl:
           mechanism: scram-sha-512
-          username: alice
+          username: ${{env.SASL_USERNAME}}
           password: ${{env.SASL_PASSWORD}}
 telemetry:
   exporters:

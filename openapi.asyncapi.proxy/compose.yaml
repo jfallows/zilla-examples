@@ -10,6 +10,7 @@ services:
       #- 4444:4444
     environment:
       ZILLA_INCUBATOR_ENABLED: "true"
+      SASL_USERNAME: alice
       SASL_PASSWORD: secret
       HTTP_PROXY: ""
       HTTPS_PROXY: ""
@@ -52,13 +53,16 @@ services:
     depends_on:
       - kafka
     environment:
-      KAFKA_BOOTSTRAP_SERVER: "kafka:9094"
+      KAFKA_BOOTSTRAP_SERVER: "kafka:9092"
+    configs:
+      - source: client.properties
+        target: /tmp/client.properties
     command:
       - "bash"
       - "-c"
       - "echo Creating topics for $${KAFKA_BOOTSTRAP_SERVER};
-        /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server $${KAFKA_BOOTSTRAP_SERVER} --create --if-not-exists --topic requests;
-        /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server $${KAFKA_BOOTSTRAP_SERVER} --create --if-not-exists --topic responses;"
+        /opt/bitnami/kafka/bin/kafka-topics.sh --command-config /tmp/client.properties --bootstrap-server $${KAFKA_BOOTSTRAP_SERVER} --create --if-not-exists --topic requests;
+        /opt/bitnami/kafka/bin/kafka-topics.sh --command-config /tmp/client.properties --bootstrap-server $${KAFKA_BOOTSTRAP_SERVER} --create --if-not-exists --topic responses;"
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -68,10 +72,17 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9094
       #KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: SASL_PLAIN
-      #KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM: SCRAM-SHA-256
+      #KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM: SCRAM-SHA-512
       #KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.scram.ScramLoginModule required username="${USERNAME}" password="${PASSWORD}";'
   #     DYNAMIC_CONFIG_ENABLED: true
 
 networks:
   default:
     driver: bridge
+
+configs:
+  client.properties:
+    content: |
+      sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="alice" password="secret";
+      security.protocol=SASL_PLAINTEXT
+      sasl.mechanism=SCRAM-SHA-512
