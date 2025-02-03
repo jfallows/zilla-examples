@@ -41,7 +41,7 @@ kcat -C -b localhost:29092 -t requests -J -u | jq '.headers[-2,-1]'
 outputs
 ```
 "zilla:correlation-id",
-"1-8d8f9e3bef21555a0f8e36619b5abe7c"
+"1-119b4c82a41a48a5eeeec0f3a69cf93c"
 ```
 Use correlation identifier to produce response.
 ```
@@ -49,9 +49,9 @@ echo '{"budgetId": "budgetId1", "msgId": "Msg001", accept: "yes", total: 100}' |
     kcat -P \
          -b localhost:29092 \
          -t responses \
-         -k "1-8d8f9e3bef21555a0f8e36619b5abe7c" \
+         -k "1-119b4c82a41a48a5eeeec0f3a69cf93c" \
          -H ":status=200" \
-         -H "zilla:correlation-id=1-8d8f9e3bef21555a0f8e36619b5abe7c"
+         -H "zilla:correlation-id=1-119b4c82a41a48a5eeeec0f3a69cf93c"
 ```
 
 #### Reserve Budget
