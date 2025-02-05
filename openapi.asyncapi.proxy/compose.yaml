@@ -3,7 +3,7 @@ services:
     image: ghcr.io/aklivity/zilla:latest
     depends_on:
       - kafka
-    pull_policy: always
+    #pull_policy: never
     restart: unless-stopped
     ports:
       - 7114:7114

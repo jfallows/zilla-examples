@@ -1,7 +1,7 @@
 # openapi.asyncapi.proxy
 ## Running locally
 
-This example runs using Docker compose. You will find the setup scripts in the [compose](./docker/compose) folder.
+This example uses `docker compose`.
 
 ### Install kcat client
 
@@ -29,7 +29,7 @@ When sending an HTTP request via Kafka request topic, the request message is sen
 
 The following command will wait for the HTTP response.
 ```bash
-curl -X PUT --location 'http://localhost:7114/budget' \
+curl -X PUT --location 'http://localhost:7114/v1/budget' \
      --header 'Content-Type: application/json' \
      --header 'Idempotency-Key: 1' \
      --data '{"budgetId": "budgetId1", "msgId": "Msg001", "amount": 100}'
@@ -41,7 +41,7 @@ kcat -C -b localhost:29092 -t requests -J -u | jq '.headers[-2,-1]'
 outputs
 ```
 "zilla:correlation-id",
-"1-119b4c82a41a48a5eeeec0f3a69cf93c"
+"1-72201d10107d556ec88869760cdd7df0"
 ```
 Use correlation identifier to produce response.
 ```
@@ -49,9 +49,9 @@ echo '{"budgetId": "budgetId1", "msgId": "Msg001", accept: "yes", total: 100}' |
     kcat -P \
          -b localhost:29092 \
          -t responses \
-         -k "1-119b4c82a41a48a5eeeec0f3a69cf93c" \
+         -k "1-72201d10107d556ec88869760cdd7df0" \
          -H ":status=200" \
-         -H "zilla:correlation-id=1-119b4c82a41a48a5eeeec0f3a69cf93c"
+         -H "zilla:correlation-id=1-72201d10107d556ec88869760cdd7df0"
 ```
 
 #### Reserve Budget
@@ -59,7 +59,7 @@ When sending an HTTP request via Kafka request topic, the request message is sen
 
 The following command will wait for the HTTP response.
 ```bash
-curl -X PUT --location 'http://localhost:7114/reservation' \
+curl -X PUT --location 'http://localhost:7114/v1/reservation' \
      --header 'Content-Type: application/json' \
      --header 'Idempotency-Key: 1' \
      --data '{"budgetId": "budgetId1", "msgId": "Msg001", "reservations": [ "amount": 60, "amount": 40 ]}'
@@ -71,7 +71,7 @@ kcat -C -b localhost:29092 -t requests -J -u | jq '.headers[-2,-1]'
 outputs
 ```
 "zilla:correlation-id",
-"1-46108a33f0174340c245b71274f2d9bb"
+"1-75b393b1a523731cf030c0489eaa17cc"
 ```
 Use correlation identifier to produce response.
 ```
@@ -79,9 +79,9 @@ echo '{"budgetId": "budgetId1", "msgId": "Msg001", accept: "yes", total: 100}' |
     kcat -P \
          -b localhost:29092 \
          -t responses \
-         -k "1-46108a33f0174340c245b71274f2d9bb" \
+         -k "1-75b393b1a523731cf030c0489eaa17cc" \
          -H ":status=200" \
-         -H "zilla:correlation-id=1-46108a33f0174340c245b71274f2d9bb"
+         -H "zilla:correlation-id=1-75b393b1a523731cf030c0489eaa17cc"
 ```
 Then `curl` request completes successfully.
 
@@ -93,32 +93,27 @@ wget https://archive.apache.org/dist/kafka/3.5.1/kafka_2.13-3.5.1.tgz
 tar xvzf kafka_2.13-3.5.1.tgz
 ```
 
-Update `client.properties` as needed with `security.protocol`, SASL `username` and `password`.
-
 Check `requests` topic for correlation identifier.
 ```
-bin/kafka-console-consumer.sh --consumer.config ../client.properties \
-  --bootstrap-server ${KAFKA_BOOTSTRAP_SERVER} \
+kafka_2.13-3.5.1/bin/kafka-console-consumer.sh \
+  --bootstrap-server localhost:29092 \
   --topic requests --from-beginning \
   --property print.key=true \
   --property print.headers=true
 ```
 ```
-:scheme:http,:method:PUT,:path:/budget,:authority:localhost:7114,user-agent:curl/8.5.0,accept:*/*,content-type:application/json,idempotency-key:1,zilla:reply-to:responses,zilla:correlation-id:1-c0ec40dc9423e97639d6ace8d215f695    1    {"budgetId": "budgetId1", "msgId": "Msg001", "amount": 100}
+:scheme:http,:method:PUT,:path:/v1/budget,:authority:localhost:7114,user-agent:curl/8.5.0,accept:*/*,content-type:application/json,idempotency-key:1,zilla:reply-to:responses,zilla:correlation-id:1-72201d10107d556ec88869760cdd7df0    1    {"budgetId": "budgetId1", "msgId": "Msg001", "amount": 100}
 ```
-The correlation identifier in this case is `1-c0ec40dc9423e97639d6ace8d215f695`.
+The correlation identifier in this case is `1-72201d10107d556ec88869760cdd7df0`.
 
 Use the correlation identifier to produce response.
 ```
-echo ':status=200,zilla:correlation-id=1-c0ec40dc9423e97639d6ace8d215f695\t1-c0ec40dc9423e97639d6ace8d215f695\t{"budgetId": "budgetId1", "msgId": "Msg001", accept: "yes", total: 100}' |
-bin/kafka-console-producer.sh --producer.config ../client.properties \
-  --bootstrap-server ${KAFKA_BOOTSTRAP_SERVER} \
+echo ':status=200,zilla:correlation-id=1-72201d10107d556ec88869760cdd7df0\t1-72201d10107d556ec88869760cdd7df0\t{"budgetId": "budgetId1", "msgId": "Msg001", accept: "yes", total: 100}' |
+kafka_2.13-3.5.1/bin/kafka-console-producer.sh \
+  --bootstrap-server localhost:29092 \
   --topic responses \
   --property parse.key=true \
   --property parse.headers=true \
-  --property key.separator="\t" \
-  --property headers.key.separator="=" \
-  --property headers.separator="," \
-  --property headers.delimiter="\t"
+  --property headers.key.separator="="
 ```
 Then `curl` request completes successfully.
